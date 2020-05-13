@@ -7,7 +7,7 @@ app.set('view engine', 'ejs'); //select view template engine
 
 app.use(express.static(path.join(__dirname, 'public'))); // to use static asset (design)
 app.use(express.json());
-app.use(express.urlencoded({extended:false}));//폼데이터를 전송하는 것을 허용
+app.use(express.urlencoded({extended:false}));//ajax로 데이터 전송하는 것을 허용
 
 
 // root 라우터
@@ -47,5 +47,12 @@ app.post('/getData',function(req, res){
     console.log('userData = ',userData);
     res.json(userData + "!!!!!");
 })
+
+/** service strart */
+app.get('/signup', function(req, res){
+    res.render('signup');
+})
+
+
 
 app.listen(3000)
