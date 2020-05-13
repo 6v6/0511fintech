@@ -1,9 +1,23 @@
 const express = require('express')
 const app = express()
 const path = require('path')
+var request = require('request')
+var mysql = require('mysql')
+
 
 app.set('views', path.join(__dirname, 'views')); // ejs file location
 app.set('view engine', 'ejs'); //select view template engine
+
+
+var connection = mysql.createConnection({
+    host     : 'localhost',
+    user     : 'root',
+    password : '0525',
+    database : 'fintech'
+  });
+
+  connection.connect();
+
 
 app.use(express.static(path.join(__dirname, 'public'))); // to use static asset (design)
 app.use(express.json());
@@ -53,6 +67,45 @@ app.get('/signup', function(req, res){
     res.render('signup');
 })
 
+app.get('/authResult',function(req, res){
+    var authCode = req.query.code;
+    console.log(authCode);
+    var option = {
+        method : "POST",
+        url : "https://testapi.openbanking.or.kr/oauth/2.0/token",
+        header : {
+            'Content-Type' : 'application/x-www-form-urlencoded',
+        },
+        form : {
+            code : authCode,
+            client_id : '9Gd2iGZ6uC8C73Sx4StubaH1UIklincOEJAnkf18',
+            client_secret : 'c3p6daWMkdGvM24WRCb0W2xdbXEqdCyGdcne7PlC',
+            redirect_uri : 'http://localhost:3000/authResult',
+            grant_type : 'authorization_code'
+        }
+    }
+    request(option, function(err, response, body){
+        if(err){
+            console.error(err);
+            throw err;
+        }
+        else{
+            var accessRequestResult = JSON.parse(body);
+            console.log(accessRequestResult);
+            res.render('resultChild', {data : accessRequestResult} )
+        }
+    })
+})
 
+app.post('/signup', function(req, res){
+    //data req get db store
+    var userName = req.body.userName;
+    var userEmail = req.body.userEmail;
+    var userPassword = req.body.userPassword;
+    var userAccessToken = req.body.userAccessToken;
+    var userRefreshToken = req.body.userRefreshToken;
+    var userSeqNo = req.body.userSeqNo; 
+    console.log(userName, userAccessToken, userSeqNo);
+})
 
 app.listen(3000)

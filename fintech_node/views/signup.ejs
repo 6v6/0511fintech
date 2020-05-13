@@ -159,6 +159,34 @@
 	<!-- Template global script file. requared all pages -->
 	<script src="js/global.script.js"></script>
     <script>
+        $("#authBtn").click(function(){
+            var tmpWindow = window.open('about:blank');
+            tmpWindow.location = "https://testapi.openbanking.or.kr/oauth/2.0/authorize?response_type=code&client_id=9Gd2iGZ6uC8C73Sx4StubaH1UIklincOEJAnkf18&redirect_uri=http://localhost:3000/authResult&scope=login inquiry transfer&state=12345678901234567890123456789012&auth_type=0";
+        })
+		$("#signupBtn").click(function(){
+            var userName = $("#userName").val();
+            var userEmail = $("#userEmail").val();
+            var userPassword = $("#userPassword").val();
+            var userAccessToken = $("#userAccessToken").val();
+            var userRefreshToken = $("#userRefreshToken").val();
+			var userSeqNo = $("#userSeqNo").val();
+            $.ajax({
+                url:'http://localhost:3000/signup',
+                type : 'POST',
+                data : {
+                    userName : userName,
+                    userEmail : userEmail,
+                    userPassword : userPassword,
+                    userAccessToken : userAccessToken,
+                    userRefreshToken : userRefreshToken,
+                    userSeqNo : userSeqNo
+                },
+                success:function(data){
+
+                }
+            })
+
+		})
     </script>
 </body>
 </html>
