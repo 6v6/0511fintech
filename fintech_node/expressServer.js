@@ -106,6 +106,20 @@ app.post('/signup', function(req, res){
     var userRefreshToken = req.body.userRefreshToken;
     var userSeqNo = req.body.userSeqNo; 
     console.log(userName, userAccessToken, userSeqNo);
+    var sql = "INSERT INTO fintech.user (name, email, password, accesstoken, refreshtoken, userseqno) VALUES (?,?,?,?,?,?)";
+    connection.query(sql, 
+        [userName, userEmail, userPassword, userAccessToken, userRefreshToken, userSeqNo],
+        function(err, result){
+            if(err){
+                console.error(err);
+                res.json(0);
+                throw err;
+            }
+            else{
+                res.json(1);
+            }
+        });
+
 })
 
 app.listen(3000)
