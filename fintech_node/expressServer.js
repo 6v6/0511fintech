@@ -107,6 +107,10 @@ app.get('/login', function(req, res){
     res.render('login');
 })
 
+app.get('/main', function(req, res){
+    res.render('main');
+})
+
 app.post('/signup', function(req, res){
     //data req get db store
     var userName = req.body.userName;
@@ -177,5 +181,31 @@ app.post('/login', function(req, res){
 
 })
 
+app.post('/list', function(req, res){
+    //
+    // api response body 
+    var option = {
+        method : "GET",
+        url : "https://testapi.openbanking.or.kr/v2.0/user/me",
+        headers : {
+            Authorization : 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiIxMTAwNzU4Nzc4Iiwic2NvcGUiOlsiaW5xdWlyeSIsImxvZ2luIiwidHJhbnNmZXIiXSwiaXNzIjoiaHR0cHM6Ly93d3cub3BlbmJhbmtpbmcub3Iua3IiLCJleHAiOjE1OTcyMDg5MDksImp0aSI6IjgwYzIwMDA5LTVhYjktNGUwZi1hOTBkLTYyNjExMzNmZjNlZSJ9.gSTlt_gCugzyQqb6yxCMRMKXIFPKcTr2tJ9u86OEbXg'
+        },
+        qs : {
+            user_seq_no : '1100758778'
+        }
+    }
+    console.log(option);
+    request(option, function(err, response, body){
+        if(err){
+            console.error(err);
+            throw err;
+        }
+        else {
+            var accessRequestResult = JSON.parse(body);
+            console.log(accessRequestResult);
+            res.json(accessRequestResult)
+        }
+    })
+})
 
 app.listen(3000)
