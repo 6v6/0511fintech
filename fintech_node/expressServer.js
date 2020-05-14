@@ -4,6 +4,7 @@ const path = require('path')
 var request = require('request')
 var mysql = require('mysql')
 var jwt = require('jsonwebtoken')
+var auth = require('./lib/auth')
 
 
 app.set('views', path.join(__dirname, 'views')); // ejs file location
@@ -61,6 +62,10 @@ app.post('/getData',function(req, res){
     var userData = req.body.userInputData;
     console.log('userData = ',userData);
     res.json(userData + "!!!!!");
+})
+
+app.post('/authTest',auth, function(req, res){
+    res.json(req.decoded)
 })
 
 /** service strart */
