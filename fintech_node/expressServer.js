@@ -111,6 +111,10 @@ app.get('/main', function(req, res){
     res.render('main');
 })
 
+app.get('/balance', function(req, res){
+    res.render('balance');
+})
+
 app.post('/signup', function(req, res){
     //data req get db store
     var userName = req.body.userName;
@@ -135,6 +139,8 @@ app.post('/signup', function(req, res){
         });
 
 })
+
+
 
 
 app.post('/login', function(req, res){
@@ -181,17 +187,26 @@ app.post('/login', function(req, res){
 
 })
 
-app.post('/list', function(req, res){
-    //
-    // api response body 
+app.post('/list', auth, function(req, res){
+
+    var userId = req.decoded.userId;
+    var sql = "SELECT * FROM user WHERE id = ?"
+    connection.query(sql, [userId], function(err, result){
+        if(err){
+            console.error(err);
+            throw err;
+        }
+        else{
+            console.log(result);
+                // api response body 
     var option = {
         method : "GET",
         url : "https://testapi.openbanking.or.kr/v2.0/user/me",
         headers : {
-            Authorization : 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiIxMTAwNzU4Nzc4Iiwic2NvcGUiOlsiaW5xdWlyeSIsImxvZ2luIiwidHJhbnNmZXIiXSwiaXNzIjoiaHR0cHM6Ly93d3cub3BlbmJhbmtpbmcub3Iua3IiLCJleHAiOjE1OTcyMDg5MDksImp0aSI6IjgwYzIwMDA5LTVhYjktNGUwZi1hOTBkLTYyNjExMzNmZjNlZSJ9.gSTlt_gCugzyQqb6yxCMRMKXIFPKcTr2tJ9u86OEbXg'
+            Authorization : 'Bearer ' + result[0].accesstoken
         },
         qs : {
-            user_seq_no : '1100758778'
+            user_seq_no : result[0].userseqno
         }
     }
     console.log(option);
@@ -206,6 +221,53 @@ app.post('/list', function(req, res){
             res.json(accessRequestResult)
         }
     })
+        }
+    })
+})
+
+
+app.post('/balance', auth, function(req, res){
+    var userId = req.decoded.userId;
+    var fin_use_num = req.body.fin_use_num;
+
+    
+    var countnum = Math.floor(Math.random() * 1000000000) + 1;
+    var transId = "T991628990U" + countnum; //이용기관 번호 본인것 입력
+
+    var sql = "SELECT * FROM user WHERE id = ?"
+    connection.query(sql, [userId], function(err, result){
+        if(err){
+            console.error(err);
+            throw err;
+        }
+        else{
+            console.log(result);
+            var option = {
+                method : "GET",
+                url : "https://testapi.openbanking.or.kr/v2.0/account/balance/fin_num",
+                headers : {
+                    Authorization : 'Bearer ' + result[0].accesstoken
+                },
+                qs : {
+                    bank_tran_id : transId,
+                    fintech_use_num : fin_use_num,
+                    tran_dtime : '20200515114200',
+                }
+            }
+            request(option, function(err, response, body){
+            if(err){
+                console.error(err);
+                throw err;
+            }
+            else {
+                var accessRequestResult = JSON.parse(body);
+                console.log(accessRequestResult);
+                res.json(accessRequestResult)
+            }
+            })
+        }
+    })
+ 
 })
 
 app.listen(3000)
