@@ -115,6 +115,16 @@ app.get('/balance', function(req, res){
     res.render('balance');
 })
 
+app.get('/qrcode', function(req, res){
+    res.render('qrcode');
+})
+
+app.get('/qr', function(req, res){
+    res.render('qrReader');
+})
+
+
+
 app.post('/signup', function(req, res){
     //data req get db store
     var userName = req.body.userName;
@@ -139,9 +149,6 @@ app.post('/signup', function(req, res){
         });
 
 })
-
-
-
 
 app.post('/login', function(req, res){
     var userEmail = req.body.userEmail;
@@ -269,5 +276,118 @@ app.post('/balance', auth, function(req, res){
     })
  
 })
+
+
+app.post('/transactionlist', auth, function(req, res){
+    var userId = req.decoded.userId;
+    var fin_use_num = req.body.fin_use_num;
+    
+    var countnum = Math.floor(Math.random() * 1000000000) + 1;
+    var transId = "T991628990U" + countnum; //이용기관 번호 본인것 입력
+
+    var sql = "SELECT * FROM user WHERE id = ?"
+    connection.query(sql, [userId], function(err, result){
+        if(err){
+            console.error(err);
+            throw err;
+        }
+        else{
+            console.log(result);
+            var option = {
+                method : "GET",
+                url : "https://testapi.openbanking.or.kr/v2.0/account/transaction_list/fin_num",
+                headers : {
+                    Authorization : 'Bearer ' + result[0].accesstoken
+                },
+                qs : {
+                    bank_tran_id : transId,
+                    fintech_use_num : fin_use_num,
+                    inquiry_type : 'A',
+                    inquiry_base : 'D',
+                    from_date : '20190101',
+                    from_time : '100000',
+                    to_date : '20190101',
+                    to_time : '100000',
+                    sort_order : 'D',
+                    tran_dtime : '20190910101921',
+                    befor_inquiry_traceinfo : '123'
+                }
+            }
+            request(option, function(err, response, body){
+            if(err){
+                console.error(err);
+                throw err;
+            }
+            else {
+                var accessRequestResult = JSON.parse(body);
+                console.log(accessRequestResult);
+                res.json(accessRequestResult)
+            }
+            })
+        }
+    })
+
+})
+
+app.post('/withdraw', auth, function(req, res){
+    var userId = req.decoded.userId;
+    var fin_use_num = req.body.fin_use_num;
+    var amount = req.body.amount;
+
+
+    var countnum = Math.floor(Math.random() * 1000000000) + 1;
+    var transId = "T991628990U" + countnum; //이용기관 번호 본인것 입력
+
+    var sql = "SELECT * FROM user WHERE id = ?"
+    connection.query(sql, [userId], function(err, result){
+        if(err){
+            console.error(err);
+            throw err;
+        }
+        else{
+            console.log(result);
+            var option = {
+                method : "POST",
+                url : "https://testapi.openbanking.or.kr/v2.0/transfer/withdraw/fin_num",
+                headers : {
+                    'Content-Type' : "application/json; charset=UTF-8",
+                    Authorization : 'Bearer ' + result[0].accesstoken
+                },
+                json : {
+                    "bank_tran_id" : transId,
+                    "cntr_account_type": "N",
+                    "cntr_account_num" :"1270658396",
+                    "dps_print_content" :"쇼핑몰환불",
+                    "fintech_use_num" : fin_use_num,
+                    "wd_print_content" :"오픈뱅킹출금",
+                    "tran_amt" : amount,
+                    "tran_dtime" : "20190910101921",
+                    "req_client_name" : "정인정",
+                    "req_client_bank_code" : "097",
+                    "req_client_account_num" : "1270658396",
+                    "req_client_fintech_usenum" : fin_use_num,
+                    "req_client_num" : "JEONGINJEONG1234",
+                    "transfer_purpose" : "TR",
+                    "recv_client_name" : "김오픈",
+                    "recv_client_bank_code" : "097",
+                    "recv_client_account_num" : "1100758778"
+                }
+            }
+            request(option, function(err, response, body){
+            if(err){
+                console.error(err);
+                throw err;
+            }
+            else {
+                console.log(body);
+                if(body.rsp_code == "A0000"){
+                    res.json(body)
+                }
+            }
+            })
+        }
+    })
+})
+
 
 app.listen(3000)
