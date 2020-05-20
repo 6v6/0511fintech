@@ -9,7 +9,8 @@ const authMiddleware = (req, res, next) => {
            server : "우리서버",
            success: false,
            message: 'not logged in'
-       })
+       }
+       )
    }
 
    const p = new Promise(

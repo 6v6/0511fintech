@@ -5,7 +5,10 @@ var request = require('request')
 var mysql = require('mysql')
 var jwt = require('jsonwebtoken')
 var auth = require('./lib/auth')
-
+//const storage = require('node-sessionstorage')
+//const store = require('store2')
+// var session = require('express-session')
+var sessionstorage = require('sessionstorage');
 
 app.set('views', path.join(__dirname, 'views')); // ejs file location
 app.set('view engine', 'ejs'); //select view template engine
@@ -108,6 +111,7 @@ app.get('/login', function(req, res){
 })
 
 app.get('/main', function(req, res){
+
     res.render('main');
 })
 
@@ -121,6 +125,10 @@ app.get('/qrcode', function(req, res){
 
 app.get('/qr', function(req, res){
     res.render('qrReader');
+})
+
+app.get('/error', function(req, res){
+    res.render('login');
 })
 
 
@@ -197,6 +205,7 @@ app.post('/login', function(req, res){
 app.post('/list', auth, function(req, res){
 
     var userId = req.decoded.userId;
+   // console.log("test",res.body);
     var sql = "SELECT * FROM user WHERE id = ?"
     connection.query(sql, [userId], function(err, result){
         if(err){

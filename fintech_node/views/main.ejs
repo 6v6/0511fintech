@@ -278,7 +278,12 @@
 	<script src="js/global.script.js"></script>
 
     <script>
-        var jwtToken = sessionStorage.getItem('jwtToken')
+		var jwtToken = sessionStorage.getItem('jwtToken')
+		if(!jwtToken){
+			alert("로그인이 필요합니다!");
+			window.location.href = '/login';
+			//redirect('/login');
+		}
         fetchUserData();
         function fetchUserData(){
             $.ajax({
