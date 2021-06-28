@@ -371,7 +371,7 @@ app.post('/withdraw', auth, function(req, res){
                     "wd_print_content" :"오픈뱅킹출금",
                     "tran_amt" : amount,
                     "tran_dtime" : "20190910101921",
-                    "req_client_name" : "정인정",
+                    "req_client_name" : "injeong",
                     "req_client_bank_code" : "097",
                     "req_client_account_num" : "1270658396",
                     "req_client_fintech_usenum" : fin_use_num,
